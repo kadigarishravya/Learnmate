@@ -32,11 +32,12 @@ def web_search():
             }
         ), 503
 
+    page_size = request.args.get("page_size", default=5, type=int) or 5
     try:
         results = GoogleWebSearchClient(settings).search(
             query=query,
             user_ip=request.remote_addr or "127.0.0.1",
-            page_size=request.args.get("page_size", default=5, type=int),
+            page_size=page_size,
         )
     except ValueError as exc:
         return jsonify({"error": str(exc)}), 400
