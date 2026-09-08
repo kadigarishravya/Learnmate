@@ -29,8 +29,7 @@ class Settings:
     cohere_api_key: str | None
     cohere_rerank_model: str
     cohere_chat_model: str
-    google_web_search_api_key: str | None
-    google_web_search_client_id: str | None
+    tavily_api_key: str | None
     uploads_path: Path
     supported_document_extensions: tuple[str, ...]
     max_upload_size_bytes: int
@@ -56,8 +55,8 @@ class Settings:
         return bool(self.cohere_api_key)
 
     @property
-    def google_web_search_configured(self) -> bool:
-        return bool(self.google_web_search_api_key and self.google_web_search_client_id)
+    def tavily_configured(self) -> bool:
+        return bool(self.tavily_api_key)
 
     @property
     def sqlalchemy_url(self) -> str:
@@ -75,8 +74,7 @@ def get_settings() -> Settings:
         cohere_api_key=os.getenv("COHERE_API_KEY") or None,
         cohere_rerank_model=os.getenv("COHERE_RERANK_MODEL", "rerank-v3.5"),
         cohere_chat_model=os.getenv("COHERE_CHAT_MODEL", "command-a-03-2025"),
-        google_web_search_api_key=os.getenv("GOOGLE_WEB_SEARCH_API_KEY") or None,
-        google_web_search_client_id=os.getenv("GOOGLE_WEB_SEARCH_CLIENT_ID") or None,
+        tavily_api_key=os.getenv("TAVILY_API_KEY") or None,
         uploads_path=Path(os.getenv("UPLOADS_PATH", str(PROJECT_ROOT / "storage" / "uploads"))),
         supported_document_extensions=tuple(
             extension.strip().lower()
