@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 
@@ -28,6 +29,8 @@ class Settings:
     cohere_api_key: str | None
     cohere_rerank_model: str
     cohere_chat_model: str
+    google_web_search_api_key: str | None
+    google_web_search_client_id: str | None
     uploads_path: Path
     supported_document_extensions: tuple[str, ...]
     max_upload_size_bytes: int
@@ -48,24 +51,32 @@ class Settings:
     adaptive_weak_score_threshold: float
     feedback_comments_max_length: int
 
-    
-
     @property
     def cohere_configured(self) -> bool:
         return bool(self.cohere_api_key)
 
     @property
+    def google_web_search_configured(self) -> bool:
+        return bool(self.google_web_search_api_key and self.google_web_search_client_id)
+
+    @property
     def sqlalchemy_url(self) -> str:
         return f"sqlite:///{self.sqlite_database_path}"
+
+
 def get_settings() -> Settings:
     return Settings(
         flask_host=os.getenv("FLASK_HOST", "127.0.0.1"),
         flask_port=int(os.getenv("FLASK_PORT", "5000")),
         flask_debug=_env_bool("FLASK_DEBUG", False),
-        sqlite_database_path=Path(os.getenv("SQLITE_DATABASE_PATH", str(PROJECT_ROOT / "storage" / "learnmate.db"))),
+        sqlite_database_path=Path(
+            os.getenv("SQLITE_DATABASE_PATH", str(PROJECT_ROOT / "storage" / "learnmate.db"))
+        ),
         cohere_api_key=os.getenv("COHERE_API_KEY") or None,
         cohere_rerank_model=os.getenv("COHERE_RERANK_MODEL", "rerank-v3.5"),
         cohere_chat_model=os.getenv("COHERE_CHAT_MODEL", "command-a-03-2025"),
+        google_web_search_api_key=os.getenv("GOOGLE_WEB_SEARCH_API_KEY") or None,
+        google_web_search_client_id=os.getenv("GOOGLE_WEB_SEARCH_CLIENT_ID") or None,
         uploads_path=Path(os.getenv("UPLOADS_PATH", str(PROJECT_ROOT / "storage" / "uploads"))),
         supported_document_extensions=tuple(
             extension.strip().lower()
