@@ -1,11 +1,11 @@
-"""Authenticated Google web search endpoint."""
+"""Authenticated Tavily web search endpoint."""
 
 from __future__ import annotations
 
 from flask import Blueprint, current_app, jsonify, request
 
 from app.api.routes.auth import _authenticated_student_id
-from app.infrastructure.google_web_search.client import GoogleWebSearchClient
+from app.infrastructure.google_web_search.client import TavilyWebSearchClient
 
 
 web_search_bp = Blueprint("web_search", __name__, url_prefix="/api/web-search")
@@ -21,22 +21,18 @@ def web_search():
         return jsonify({"error": "search query is required"}), 400
 
     settings = current_app.config["LEARNMATE_SETTINGS"]
-    if not settings.google_web_search_configured:
+    if not settings.tavily_configured:
         return jsonify(
             {
-                "error": "Google web search is not configured",
-                "required_configuration": [
-                    "GOOGLE_WEB_SEARCH_API_KEY",
-                    "GOOGLE_WEB_SEARCH_CLIENT_ID",
-                ],
+                "error": "Tavily web search is not configured",
+                "required_configuration": ["TAVILY_API_KEY"],
             }
         ), 503
 
     page_size = request.args.get("page_size", default=5, type=int) or 5
     try:
-        results = GoogleWebSearchClient(settings).search(
+        results = TavilyWebSearchClient(settings).search(
             query=query,
-            user_ip=request.remote_addr or "127.0.0.1",
             page_size=page_size,
         )
     except ValueError as exc:
