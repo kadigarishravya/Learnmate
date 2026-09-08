@@ -1,0 +1,11 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.vscode/
+storage/uploads/*
+storage/chroma/*
+!storage/uploads/.gitkeep
+!storage/chroma/.gitkeep
