@@ -1,4 +1,4 @@
-"""Minimal Streamlit authentication UI for Phase 2."""
+"""Streamlit student UI for LearnMate."""
 
 from __future__ import annotations
 
@@ -81,6 +81,7 @@ def _show_authenticated_state() -> None:
             st.rerun()
         _show_materials()
         _show_tutor()
+        _show_web_search()
         _show_quizzes()
         _show_phase6()
     except requests.RequestException as exc:
@@ -171,6 +172,42 @@ def _show_tutor() -> None:
                 st.error(response.json().get("error", "Could not clear context"))
         except requests.RequestException as exc:
             st.error(f"Context clear request failed: {exc}")
+
+
+def _show_web_search() -> None:
+    st.header("Web Search")
+    with st.form("web_search_form"):
+        query = st.text_input("Search the web")
+        submitted = st.form_submit_button("Search")
+    if not submitted:
+        return
+    if not query.strip():
+        st.error("Enter a search query.")
+        return
+    try:
+        response = _request("GET", "/api/web-search", params={"q": query, "page_size": 5})
+        payload = response.json()
+        if response.status_code == 200:
+            results = payload.get("results", [])
+            if not results:
+                st.info("No web search results found.")
+                return
+            for index, result in enumerate(results, start=1):
+                title = result.get("title") or "Untitled result"
+                url = result.get("url") or ""
+                snippet = result.get("snippet") or ""
+                st.markdown(f"**{index}. {title}**")
+                if url:
+                    st.markdown(f"{url}")
+                if snippet:
+                    st.write(snippet)
+        else:
+            st.error(payload.get("error", "Web search failed"))
+            required = payload.get("required_configuration")
+            if required:
+                st.caption("Configure: " + ", ".join(required))
+    except requests.RequestException as exc:
+        st.error(f"Web search request failed: {exc}")
 
 
 def _show_quizzes() -> None:
