@@ -1,17 +1,18 @@
-"""Flask application factory for the Phase 1 API foundation."""
+"""Flask application factory for the LearnMate API."""
 
 from __future__ import annotations
 
 from flask import Flask, jsonify
 from werkzeug.exceptions import HTTPException
 
-from app.common.logging_config import configure_logging
-from app.config.settings import Settings, get_settings
 from app.api.routes.auth import auth_bp
 from app.api.routes.documents import documents_bp
-from app.api.routes.tutor import tutor_bp
-from app.api.routes.quizzes import quizzes_bp
 from app.api.routes.phase6 import phase6_bp
+from app.api.routes.quizzes import quizzes_bp
+from app.api.routes.tutor import tutor_bp
+from app.api.routes.web_search import web_search_bp
+from app.common.logging_config import configure_logging
+from app.config.settings import Settings, get_settings
 from app.modules.student_management.sessions import SessionManager
 
 
@@ -28,6 +29,7 @@ def create_app(settings: Settings | None = None) -> Flask:
     app.register_blueprint(tutor_bp)
     app.register_blueprint(quizzes_bp)
     app.register_blueprint(phase6_bp)
+    app.register_blueprint(web_search_bp)
 
     @app.get("/api/health")
     def health():
