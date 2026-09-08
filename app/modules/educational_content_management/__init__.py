@@ -1,0 +1,1 @@
+"""Educational Content Management module boundary."""

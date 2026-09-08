@@ -1,0 +1,1 @@
+"""Embedding Generation module boundary."""
