@@ -48,5 +48,8 @@ def create_session_factory(settings: Settings):
     engine = create_engine(settings)
 
     from sqlalchemy.orm import sessionmaker
+    from app.infrastructure.sql_server.models import Base
+
+    Base.metadata.create_all(engine)
 
     return sessionmaker(bind=engine, expire_on_commit=False)

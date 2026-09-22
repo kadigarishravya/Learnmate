@@ -2,10 +2,21 @@ import os
 import unittest
 from unittest.mock import patch
 
-from app.config.settings import get_settings
+from app.config.settings import PROJECT_ROOT, get_settings
 
 
 class SettingsTests(unittest.TestCase):
+    def test_relative_storage_paths_are_anchored_to_repository(self):
+        with patch.dict(os.environ, {
+            "SQLITE_DATABASE_PATH": "storage/custom.db",
+            "UPLOADS_PATH": "storage/uploads",
+            "CHROMA_PATH": "storage/chroma",
+        }):
+            settings = get_settings()
+        self.assertEqual(settings.sqlite_database_path, PROJECT_ROOT / "storage/custom.db")
+        self.assertEqual(settings.uploads_path, PROJECT_ROOT / "storage/uploads")
+        self.assertEqual(settings.chroma_path, PROJECT_ROOT / "storage/chroma")
+
     def test_defaults_use_locked_rag_configuration(self):
         with patch.dict(os.environ, {}, clear=True):
             settings = get_settings()

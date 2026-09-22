@@ -13,7 +13,7 @@ class QueryResponseRepository:
 
     def create_query(self, student_id: int, question: str, subject: str | None, timestamp) -> Query:
         with self._session_factory() as session:
-            query = Query(student_id=student_id, question=question, subject=subject, timestamp=timestamp)
+            query = Query(student_id=student_id, question=question, subject=subject or "General", timestamp=timestamp)
             session.add(query)
             session.commit()
             session.refresh(query)

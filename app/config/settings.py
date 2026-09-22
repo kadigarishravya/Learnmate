@@ -20,6 +20,11 @@ def _env_bool(name: str, default: bool) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _env_path(name: str, default: str) -> Path:
+    path = Path(os.getenv(name) or default).expanduser()
+    return path if path.is_absolute() else PROJECT_ROOT / path
+
+
 @dataclass(frozen=True)
 class Settings:
     flask_host: str
@@ -68,21 +73,19 @@ def get_settings() -> Settings:
         flask_host=os.getenv("FLASK_HOST", "127.0.0.1"),
         flask_port=int(os.getenv("FLASK_PORT", "5000")),
         flask_debug=_env_bool("FLASK_DEBUG", False),
-        sqlite_database_path=Path(
-            os.getenv("SQLITE_DATABASE_PATH", str(PROJECT_ROOT / "storage" / "learnmate.db"))
-        ),
+        sqlite_database_path=_env_path("SQLITE_DATABASE_PATH", "storage/learnmate.db"),
         cohere_api_key=os.getenv("COHERE_API_KEY") or None,
         cohere_rerank_model=os.getenv("COHERE_RERANK_MODEL", "rerank-v3.5"),
         cohere_chat_model=os.getenv("COHERE_CHAT_MODEL", "command-a-03-2025"),
         tavily_api_key=os.getenv("TAVILY_API_KEY") or None,
-        uploads_path=Path(os.getenv("UPLOADS_PATH", str(PROJECT_ROOT / "storage" / "uploads"))),
+        uploads_path=_env_path("UPLOADS_PATH", "storage/uploads"),
         supported_document_extensions=tuple(
             extension.strip().lower()
             for extension in os.getenv("SUPPORTED_DOCUMENT_EXTENSIONS", ".pdf").split(",")
             if extension.strip()
         ),
         max_upload_size_bytes=int(os.getenv("MAX_UPLOAD_SIZE_BYTES", "10485760")),
-        chroma_path=Path(os.getenv("CHROMA_PATH", str(PROJECT_ROOT / "storage" / "chroma"))),
+        chroma_path=_env_path("CHROMA_PATH", "storage/chroma"),
         embedding_model=os.getenv(
             "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
         ),

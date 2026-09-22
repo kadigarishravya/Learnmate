@@ -15,8 +15,7 @@ COLLECTION_NAME = "learnmate_educational_document_chunks"
 class ChromaDocumentStore:
     def __init__(self, settings: Settings, collection=None):
         self.settings = settings
-        client = create_client(settings)
-        self.collection = collection or client.get_or_create_collection(name=COLLECTION_NAME)
+        self.collection = collection if collection is not None else create_client(settings).get_or_create_collection(name=COLLECTION_NAME)
 
     @staticmethod
     def vector_ids(document_id: int, chunk_count: int) -> list[str]:

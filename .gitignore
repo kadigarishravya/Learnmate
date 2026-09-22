@@ -1,10 +1,13 @@
 .env
 .venv/
+.python/
 venv/
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .vscode/
+storage/*.db*
+storage/logs/
 storage/uploads/*
 storage/chroma/*
 !storage/uploads/.gitkeep

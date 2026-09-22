@@ -121,6 +121,22 @@ class TutorServiceTests(unittest.TestCase):
         self.service.answer(7, self.session_id, "Explain it simply")
         self.assertIn("Newton's second law", self.tutor.messages[-1][0]["content"])
 
+    def test_inferred_subject_mismatch_retries_with_student_scope(self):
+        calls = []
+
+        class SubjectMismatchStore:
+            def search(store, **kwargs):
+                calls.append(kwargs)
+                return [] if kwargs.get("subject") else [self.chunk]
+
+        self.service.vector_store = SubjectMismatchStore()
+        result = self.service.answer(7, self.session_id, "Explain physics force")
+        self.assertTrue(result.grounded)
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(calls[0]["subject"], "Physics")
+        self.assertEqual(calls[1]["student_id"], 7)
+        self.assertNotIn("subject", calls[1])
+
     def test_no_chunks_returns_transparent_non_grounded_response(self):
         self.service.vector_store.chunks = []
         self.service.reranker.chunks = []

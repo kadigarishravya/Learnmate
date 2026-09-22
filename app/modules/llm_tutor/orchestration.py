@@ -75,6 +75,13 @@ class TutorService:
                 top_k=self.settings.retrieval_top_k,
                 subject=understanding.subject,
             )
+            # A guessed subject need not match the student's free-text PDF label.
+            if not candidates and understanding.subject:
+                candidates = self.vector_store.search(
+                    query_embedding=query_embedding,
+                    student_id=student_id,
+                    top_k=self.settings.retrieval_top_k,
+                )
         except Exception as exc:
             raise RuntimeError("Chroma retrieval failed") from exc
         reranked = self.reranker.rerank(retrieval_query, candidates)

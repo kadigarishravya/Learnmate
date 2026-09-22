@@ -7,8 +7,13 @@ import os
 import requests
 import streamlit as st
 
+from app.config.settings import PROJECT_ROOT
+from dotenv import load_dotenv
+
+load_dotenv(PROJECT_ROOT / ".env")
 
 API_URL = os.getenv("LEARNMATE_API_URL", "http://127.0.0.1:5000").rstrip("/")
+API_TIMEOUT = float(os.getenv("LEARNMATE_API_TIMEOUT_SECONDS", "300"))
 
 
 def _headers() -> dict[str, str]:
@@ -18,7 +23,7 @@ def _headers() -> dict[str, str]:
 
 def _request(method: str, path: str, **kwargs):
     return requests.request(
-        method, f"{API_URL}{path}", headers=_headers(), timeout=5, **kwargs
+        method, f"{API_URL}{path}", headers=_headers(), timeout=(5, API_TIMEOUT), **kwargs
     )
 
 
